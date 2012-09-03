@@ -1,0 +1,8 @@
+mod common;
+mod pk11pub;
+mod pkcs11t;
+mod secmodt;
+
+// FIXME: Remove this eventually.
+mod nsprpub;
+
