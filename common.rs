@@ -36,10 +36,10 @@ struct Item {
 }
 
 impl Item {
-    unsafe fn unwrap(&self) -> SECItem {
+    unsafe fn unwrap(&const self) -> SECItem {
         SECItemStr {
             sec_type: self.sec_type,
-            data: vec::unsafe::to_ptr_slice(self.data),
+            data: vec::raw::to_ptr(self.data),
             len: self.data.len() as c_uint
         }
     }
