@@ -14,7 +14,7 @@ use secmodt::PK11Origin;
 use libc::{c_uchar, c_uint, c_void};
 use ptr::{null, to_mut_unsafe_ptr, to_unsafe_ptr};
 use result::{Err, Ok, Result};
-use vec::unsafe::to_ptr_slice;
+use vec::raw::to_ptr;
 
 // Slot mapping utility functions
 
@@ -85,9 +85,11 @@ mod Context {
     fn new_with_sym_key(ty: CKMechanismType, operation: CKAttributeType, sym_key: &SymKey,
                         param: &mut Item)
                      -> Context {
-        let cx = PK11_CreateContextBySymKey(ty, operation, sym_key.obj,
-                                            to_unsafe_ptr(&param.unwrap()));
-        Context::wrap(cx)
+		unsafe {
+			let cx = PK11_CreateContextBySymKey(ty, operation, sym_key.obj,
+												to_unsafe_ptr(&param.unwrap()));
+			Context::wrap(cx)
+		}
     }
 }
 
@@ -98,7 +100,7 @@ impl Context {
 
     fn digest_op(&self, data: &[u8]) -> NSSResult {
         unsafe {
-            PK11_DigestOp(self.obj, to_ptr_slice(data), data.len() as c_uint).to_result()
+            PK11_DigestOp(self.obj, to_ptr(data), data.len() as c_uint).to_result()
         }
     }
 
@@ -108,7 +110,7 @@ impl Context {
             let mut length = 0;
             let orig_length = bytes.len() as c_uint;
             let status = PK11_DigestFinal(self.obj,
-                                          to_ptr_slice(bytes),
+                                          to_ptr(bytes),
                                           to_mut_unsafe_ptr(&mut length),
                                           to_unsafe_ptr(&orig_length));
             if status > 0 { return Err(()); }

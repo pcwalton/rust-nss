@@ -21,7 +21,8 @@ fn init_nodb(configdir: &str) -> NSSResult {
     }
 }
 
-#[link_name="nss3"]
+#[link_args="-lnss3"]
+#[nolink]
 extern {
     fn NSS_Init(configdir: *c_char) -> SECStatus;
     fn NSS_NoDB_Init(configdir: *c_char) -> SECStatus;
